@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Bell, Plus, Activity, Calendar, Pill, Utensils, TrendingUp, Clock, AlertCircle, MessageCircle, Send, Users, Heart, Crown, Check, Star } from "lucide-react";
+import { Bell, Plus, Activity, Calendar, Pill, Utensils, TrendingUp, Clock, AlertCircle, MessageCircle, Send, Users, Heart, Crown, Check, Star, Award, Trophy, Target, ChefHat, Filter, Timer, Info } from "lucide-react";
 
 interface GlucoseReading {
   id: string;
@@ -35,10 +35,33 @@ interface ChatMessage {
   avatar: string;
 }
 
+interface PointsSystem {
+  totalPoints: number;
+  level: string;
+  consecutiveDays: number;
+  todayPoints: number;
+  levelProgress: number;
+}
+
+interface Recipe {
+  id: string;
+  name: string;
+  category: "café da manhã" | "almoço" | "jantar" | "lanche";
+  prepTime: number;
+  servings: number;
+  carbs: number;
+  calories: number;
+  ingredients: string[];
+  instructions: string[];
+  diabeticTips: string;
+}
+
 export default function DiabetCareApp() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isClient, setIsClient] = useState(false);
-  const [activeTab, setActiveTab] = useState<"dashboard" | "chat" | "subscription">("dashboard");
+  const [activeTab, setActiveTab] = useState<"dashboard" | "chat" | "subscription" | "points" | "recipes">("dashboard");
+  const [selectedRecipeCategory, setSelectedRecipeCategory] = useState<"todas" | Recipe["category"]>("todas");
+  
   const [glucoseReadings, setGlucoseReadings] = useState<GlucoseReading[]>([
     { id: "1", value: 95, time: "08:00", date: "2024-01-15", period: "jejum" },
     { id: "2", value: 140, time: "14:30", date: "2024-01-15", period: "pós-refeição" },
@@ -59,6 +82,117 @@ export default function DiabetCareApp() {
       dosage: "5mg",
       times: ["08:00"],
       taken: [true]
+    }
+  ]);
+
+  const [pointsSystem, setPointsSystem] = useState<PointsSystem>({
+    totalPoints: 1250,
+    level: "Comprometido",
+    consecutiveDays: 12,
+    todayPoints: 20,
+    levelProgress: 65
+  });
+
+  const [recipes] = useState<Recipe[]>([
+    {
+      id: "1",
+      name: "Omelete de Espinafre com Queijo",
+      category: "café da manhã",
+      prepTime: 15,
+      servings: 1,
+      carbs: 5,
+      calories: 280,
+      ingredients: [
+        "2 ovos",
+        "1 xícara de espinafre fresco",
+        "30g de queijo minas light",
+        "1 colher de chá de azeite",
+        "Sal e pimenta a gosto"
+      ],
+      instructions: [
+        "Aqueça o azeite em uma frigideira antiaderente",
+        "Refogue o espinafre até murchar",
+        "Bata os ovos e tempere com sal e pimenta",
+        "Despeje os ovos na frigideira sobre o espinafre",
+        "Adicione o queijo e dobre a omelete ao meio",
+        "Sirva imediatamente"
+      ],
+      diabeticTips: "Rica em proteínas e baixa em carboidratos, ideal para manter a glicemia estável pela manhã."
+    },
+    {
+      id: "2",
+      name: "Salmão Grelhado com Legumes",
+      category: "almoço",
+      prepTime: 25,
+      servings: 2,
+      carbs: 12,
+      calories: 350,
+      ingredients: [
+        "2 filés de salmão (150g cada)",
+        "1 abobrinha média cortada em fatias",
+        "1 berinjela pequena em cubos",
+        "1 pimentão vermelho em tiras",
+        "2 colheres de sopa de azeite",
+        "Ervas finas, sal e pimenta"
+      ],
+      instructions: [
+        "Tempere o salmão com sal, pimenta e ervas",
+        "Aqueça uma grelha ou frigideira",
+        "Grelhe o salmão por 4-5 minutos de cada lado",
+        "Em outra panela, refogue os legumes no azeite",
+        "Tempere os legumes com sal e pimenta",
+        "Sirva o salmão sobre os legumes"
+      ],
+      diabeticTips: "Ômega-3 do salmão ajuda na sensibilidade à insulina. Legumes fornecem fibras que controlam a absorção de glicose."
+    },
+    {
+      id: "3",
+      name: "Frango ao Curry com Couve-flor",
+      category: "jantar",
+      prepTime: 30,
+      servings: 3,
+      carbs: 8,
+      calories: 290,
+      ingredients: [
+        "400g de peito de frango em cubos",
+        "1 couve-flor média cortada em buquês",
+        "1 cebola média picada",
+        "2 dentes de alho picados",
+        "1 colher de sopa de curry em pó",
+        "200ml de leite de coco light",
+        "Sal e coentro fresco"
+      ],
+      instructions: [
+        "Tempere o frango com sal e curry",
+        "Refogue a cebola e alho até dourar",
+        "Adicione o frango e cozinhe até dourar",
+        "Acrescente a couve-flor e o leite de coco",
+        "Cozinhe em fogo baixo por 15 minutos",
+        "Finalize com coentro fresco"
+      ],
+      diabeticTips: "Couve-flor substitui o arroz tradicional, reduzindo carboidratos. Curry tem propriedades anti-inflamatórias."
+    },
+    {
+      id: "4",
+      name: "Mix de Castanhas e Sementes",
+      category: "lanche",
+      prepTime: 5,
+      servings: 1,
+      carbs: 6,
+      calories: 180,
+      ingredients: [
+        "10 amêndoas",
+        "5 castanhas do Pará",
+        "1 colher de sopa de sementes de girassol",
+        "1 colher de chá de sementes de chia",
+        "Pitada de canela em pó"
+      ],
+      instructions: [
+        "Misture todas as castanhas e sementes",
+        "Polvilhe com canela",
+        "Consuma como lanche entre as refeições"
+      ],
+      diabeticTips: "Gorduras boas e fibras que promovem saciedade sem elevar a glicemia. Ideal para lanches."
     }
   ]);
 
@@ -185,6 +319,27 @@ export default function DiabetCareApp() {
     ));
   };
 
+  const markMedicationTaken = (medicationId: string, timeIndex: number) => {
+    setMedications(medications.map(med => {
+      if (med.id === medicationId) {
+        const newTaken = [...med.taken];
+        newTaken[timeIndex] = true;
+        
+        // Adicionar pontos quando marcar medicamento como tomado
+        if (!med.taken[timeIndex]) {
+          setPointsSystem(prev => ({
+            ...prev,
+            totalPoints: prev.totalPoints + 10,
+            todayPoints: prev.todayPoints + 10
+          }));
+        }
+        
+        return { ...med, taken: newTaken };
+      }
+      return med;
+    }));
+  };
+
   const getGlucoseStatus = (value: number, period: string) => {
     if (period === "jejum") {
       if (value < 70) return { status: "baixo", color: "text-blue-600" };
@@ -198,6 +353,21 @@ export default function DiabetCareApp() {
       return { status: "alto", color: "text-red-600" };
     }
   };
+
+  const getLevelInfo = (level: string) => {
+    const levels = {
+      "Iniciante": { icon: "🌱", color: "text-green-500", description: "Começando a jornada" },
+      "Comprometido": { icon: "💪", color: "text-blue-500", description: "Mantendo a consistência" },
+      "Disciplinado": { icon: "🎯", color: "text-purple-500", description: "Foco total no tratamento" },
+      "Expert": { icon: "⭐", color: "text-yellow-500", description: "Mestre no autocuidado" },
+      "Mestre": { icon: "👑", color: "text-gold-500", description: "Exemplo de dedicação" }
+    };
+    return levels[level as keyof typeof levels] || levels["Iniciante"];
+  };
+
+  const filteredRecipes = selectedRecipeCategory === "todas" 
+    ? recipes 
+    : recipes.filter(recipe => recipe.category === selectedRecipeCategory);
 
   const latestGlucose = glucoseReadings[0];
   const averageGlucose = Math.round(glucoseReadings.reduce((sum, reading) => sum + reading.value, 0) / glucoseReadings.length);
@@ -252,10 +422,10 @@ export default function DiabetCareApp() {
 
         {/* Navigation Tabs */}
         <div className="bg-white rounded-2xl shadow-lg mb-6">
-          <div className="flex border-b border-gray-200">
+          <div className="flex border-b border-gray-200 overflow-x-auto">
             <button
               onClick={() => setActiveTab("dashboard")}
-              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors whitespace-nowrap ${
                 activeTab === "dashboard" 
                   ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" 
                   : "text-gray-500 hover:text-gray-700"
@@ -265,8 +435,30 @@ export default function DiabetCareApp() {
               Dashboard
             </button>
             <button
+              onClick={() => setActiveTab("points")}
+              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors whitespace-nowrap ${
+                activeTab === "points" 
+                  ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" 
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <Award className="h-5 w-5 mr-2" />
+              Pontuação
+            </button>
+            <button
+              onClick={() => setActiveTab("recipes")}
+              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors whitespace-nowrap ${
+                activeTab === "recipes" 
+                  ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" 
+                  : "text-gray-500 hover:text-gray-700"
+              }`}
+            >
+              <ChefHat className="h-5 w-5 mr-2" />
+              Receitas
+            </button>
+            <button
               onClick={() => setActiveTab("chat")}
-              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors whitespace-nowrap ${
                 activeTab === "chat" 
                   ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" 
                   : "text-gray-500 hover:text-gray-700"
@@ -277,7 +469,7 @@ export default function DiabetCareApp() {
             </button>
             <button
               onClick={() => setActiveTab("subscription")}
-              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors ${
+              className={`flex-1 flex items-center justify-center py-4 px-6 font-medium transition-colors whitespace-nowrap ${
                 activeTab === "subscription" 
                   ? "text-indigo-600 border-b-2 border-indigo-600 bg-indigo-50" 
                   : "text-gray-500 hover:text-gray-700"
@@ -460,9 +652,16 @@ export default function DiabetCareApp() {
                         {medication.times.map((time, index) => (
                           <div key={index} className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">{time}</span>
-                            <div className={`w-3 h-3 rounded-full ${
-                              medication.taken[index] ? 'bg-green-500' : 'bg-gray-300'
-                            }`} />
+                            <button
+                              onClick={() => markMedicationTaken(medication.id, index)}
+                              className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                                medication.taken[index] 
+                                  ? 'bg-green-500 border-green-500 text-white' 
+                                  : 'border-gray-300 hover:border-green-400'
+                              }`}
+                            >
+                              {medication.taken[index] && <Check className="h-3 w-3" />}
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -510,6 +709,391 @@ export default function DiabetCareApp() {
               </div>
             </div>
           </>
+        )}
+
+        {/* Points System Content */}
+        {activeTab === "points" && (
+          <div className="space-y-6">
+            {/* Header da Pontuação */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl shadow-lg p-8 text-white text-center">
+              <Trophy className="h-16 w-16 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold mb-2">Sistema de Pontuação</h2>
+              <p className="text-purple-100">Seja recompensado por cuidar da sua saúde!</p>
+            </div>
+
+            {/* Status Atual */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Pontos Totais */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+                <div className="bg-yellow-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <Star className="h-8 w-8 text-yellow-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Pontos Totais</h3>
+                <div className="text-3xl font-bold text-yellow-600 mb-1">
+                  {pointsSystem.totalPoints}
+                </div>
+                <p className="text-sm text-gray-600">Pontos acumulados</p>
+              </div>
+
+              {/* Nível Atual */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+                <div className={`bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4`}>
+                  <span className="text-2xl">{getLevelInfo(pointsSystem.level).icon}</span>
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Nível Atual</h3>
+                <div className={`text-2xl font-bold mb-1 ${getLevelInfo(pointsSystem.level).color}`}>
+                  {pointsSystem.level}
+                </div>
+                <p className="text-sm text-gray-600">{getLevelInfo(pointsSystem.level).description}</p>
+              </div>
+
+              {/* Sequência */}
+              <div className="bg-white rounded-2xl shadow-lg p-6 text-center">
+                <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <Target className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-2">Sequência</h3>
+                <div className="text-3xl font-bold text-green-600 mb-1">
+                  {pointsSystem.consecutiveDays}
+                </div>
+                <p className="text-sm text-gray-600">Dias consecutivos</p>
+              </div>
+            </div>
+
+            {/* Progresso do Nível */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Progresso para o Próximo Nível</h3>
+              <div className="mb-4">
+                <div className="flex justify-between text-sm text-gray-600 mb-2">
+                  <span>{pointsSystem.level}</span>
+                  <span>{pointsSystem.levelProgress}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-3">
+                  <div 
+                    className="bg-gradient-to-r from-purple-500 to-indigo-500 h-3 rounded-full transition-all duration-300"
+                    style={{ width: `${pointsSystem.levelProgress}%` }}
+                  ></div>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">
+                Continue tomando seus medicamentos no horário para avançar de nível!
+              </p>
+            </div>
+
+            {/* Como Ganhar Pontos */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Como Ganhar Pontos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="flex items-center p-4 bg-green-50 rounded-lg">
+                  <div className="bg-green-500 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                    <Pill className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Medicamento no Horário</h4>
+                    <p className="text-sm text-gray-600">+10 pontos por dose</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center p-4 bg-blue-50 rounded-lg">
+                  <div className="bg-blue-500 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                    <Activity className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Registro de Glicemia</h4>
+                    <p className="text-sm text-gray-600">+5 pontos por medição</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center p-4 bg-purple-50 rounded-lg">
+                  <div className="bg-purple-500 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                    <Target className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Sequência de 7 Dias</h4>
+                    <p className="text-sm text-gray-600">+50 pontos bônus</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center p-4 bg-yellow-50 rounded-lg">
+                  <div className="bg-yellow-500 rounded-full w-10 h-10 flex items-center justify-center mr-4">
+                    <Trophy className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800">Meta Mensal</h4>
+                    <p className="text-sm text-gray-600">+100 pontos bônus</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Níveis e Recompensas */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Níveis e Recompensas</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-4">🌱</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Iniciante</h4>
+                      <p className="text-sm text-gray-600">0 - 500 pontos</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">Começando a jornada</div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-4">💪</span>
+                    <div>
+                      <h4 className="font-semibold text-blue-800">Comprometido</h4>
+                      <p className="text-sm text-blue-600">501 - 1500 pontos</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-blue-600 font-medium">Nível Atual</div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-4">🎯</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Disciplinado</h4>
+                      <p className="text-sm text-gray-600">1501 - 3000 pontos</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">Foco total no tratamento</div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-4">⭐</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Expert</h4>
+                      <p className="text-sm text-gray-600">3001 - 5000 pontos</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">Mestre no autocuidado</div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center">
+                    <span className="text-2xl mr-4">👑</span>
+                    <div>
+                      <h4 className="font-semibold text-gray-800">Mestre</h4>
+                      <p className="text-sm text-gray-600">5000+ pontos</p>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-500">Exemplo de dedicação</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Estatísticas de Hoje */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Pontos de Hoje</h3>
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-3xl font-bold text-green-600 mb-1">
+                    +{pointsSystem.todayPoints}
+                  </div>
+                  <p className="text-sm text-gray-600">Pontos ganhos hoje</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-600 mb-1">Continue assim!</p>
+                  <p className="text-xs text-gray-500">
+                    Você está no caminho certo para o próximo nível
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Recipes Content */}
+        {activeTab === "recipes" && (
+          <div className="space-y-6">
+            {/* Header das Receitas */}
+            <div className="bg-gradient-to-r from-green-600 to-teal-600 rounded-2xl shadow-lg p-8 text-white text-center">
+              <ChefHat className="h-16 w-16 mx-auto mb-4" />
+              <h2 className="text-3xl font-bold mb-2">Receitas Saudáveis</h2>
+              <p className="text-green-100">Deliciosas opções para diabéticos</p>
+            </div>
+
+            {/* Filtros */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <div className="flex items-center mb-4">
+                <Filter className="h-5 w-5 text-gray-600 mr-2" />
+                <h3 className="text-lg font-semibold text-gray-800">Filtrar por Categoria</h3>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  onClick={() => setSelectedRecipeCategory("todas")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedRecipeCategory === "todas"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Todas
+                </button>
+                <button
+                  onClick={() => setSelectedRecipeCategory("café da manhã")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedRecipeCategory === "café da manhã"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Café da Manhã
+                </button>
+                <button
+                  onClick={() => setSelectedRecipeCategory("almoço")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedRecipeCategory === "almoço"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Almoço
+                </button>
+                <button
+                  onClick={() => setSelectedRecipeCategory("jantar")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedRecipeCategory === "jantar"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Jantar
+                </button>
+                <button
+                  onClick={() => setSelectedRecipeCategory("lanche")}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    selectedRecipeCategory === "lanche"
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  Lanche
+                </button>
+              </div>
+            </div>
+
+            {/* Lista de Receitas */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {filteredRecipes.map(recipe => (
+                <div key={recipe.id} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                  {/* Header da Receita */}
+                  <div className="bg-gradient-to-r from-green-500 to-teal-500 p-6 text-white">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-xl font-bold">{recipe.name}</h3>
+                      <span className="bg-white/20 px-3 py-1 rounded-full text-sm capitalize">
+                        {recipe.category}
+                      </span>
+                    </div>
+                    
+                    <div className="flex items-center space-x-4 text-sm">
+                      <div className="flex items-center">
+                        <Timer className="h-4 w-4 mr-1" />
+                        {recipe.prepTime} min
+                      </div>
+                      <div className="flex items-center">
+                        <Users className="h-4 w-4 mr-1" />
+                        {recipe.servings} porção{recipe.servings > 1 ? 'ões' : ''}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Informações Nutricionais */}
+                  <div className="p-6 border-b border-gray-200">
+                    <h4 className="font-semibold text-gray-800 mb-3">Informações Nutricionais (por porção)</h4>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="bg-blue-50 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-blue-600">{recipe.carbs}g</div>
+                        <div className="text-sm text-blue-700">Carboidratos</div>
+                      </div>
+                      <div className="bg-orange-50 rounded-lg p-3 text-center">
+                        <div className="text-2xl font-bold text-orange-600">{recipe.calories}</div>
+                        <div className="text-sm text-orange-700">Calorias</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Ingredientes */}
+                  <div className="p-6 border-b border-gray-200">
+                    <h4 className="font-semibold text-gray-800 mb-3">Ingredientes</h4>
+                    <ul className="space-y-2">
+                      {recipe.ingredients.map((ingredient, index) => (
+                        <li key={index} className="flex items-center text-sm text-gray-600">
+                          <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                          {ingredient}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Modo de Preparo */}
+                  <div className="p-6 border-b border-gray-200">
+                    <h4 className="font-semibold text-gray-800 mb-3">Modo de Preparo</h4>
+                    <ol className="space-y-2">
+                      {recipe.instructions.map((instruction, index) => (
+                        <li key={index} className="flex text-sm text-gray-600">
+                          <span className="bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs mr-3 mt-0.5 flex-shrink-0">
+                            {index + 1}
+                          </span>
+                          {instruction}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  {/* Dica para Diabéticos */}
+                  <div className="p-6 bg-green-50">
+                    <div className="flex items-start">
+                      <Info className="h-5 w-5 text-green-600 mr-3 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-green-800 mb-2">Dica para Diabéticos</h4>
+                        <p className="text-sm text-green-700">{recipe.diabeticTips}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Dicas Gerais */}
+            <div className="bg-white rounded-2xl shadow-lg p-6">
+              <h3 className="text-xl font-semibold text-gray-800 mb-4">Dicas Importantes para Diabéticos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-blue-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-blue-800 mb-2">🥗 Controle de Porções</h4>
+                  <p className="text-sm text-blue-700">
+                    Use o método do prato: 1/2 vegetais, 1/4 proteína magra, 1/4 carboidratos complexos.
+                  </p>
+                </div>
+                
+                <div className="bg-green-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-800 mb-2">🌾 Fibras são Aliadas</h4>
+                  <p className="text-sm text-green-700">
+                    Alimentos ricos em fibras ajudam a controlar a glicemia e promovem saciedade.
+                  </p>
+                </div>
+                
+                <div className="bg-purple-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-purple-800 mb-2">⏰ Horários Regulares</h4>
+                  <p className="text-sm text-purple-700">
+                    Mantenha horários regulares para as refeições para melhor controle glicêmico.
+                  </p>
+                </div>
+                
+                <div className="bg-orange-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-orange-800 mb-2">💧 Hidratação</h4>
+                  <p className="text-sm text-orange-700">
+                    Beba bastante água e evite bebidas açucaradas para manter a glicemia estável.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Chat Content */}
